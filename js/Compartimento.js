@@ -112,4 +112,4 @@ class Compartimento{
     }
 }
 
-alert('Compartimento OK');
+//alert('Compartimento OK');

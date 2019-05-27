@@ -588,4 +588,4 @@ function clickRadio(obj){
     }catch(err){ alert('Erro clickRadio: '+err); }
 }
 
-alert('compartimentos OK');
+//alert('compartimentos OK');

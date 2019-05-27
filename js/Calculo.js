@@ -209,4 +209,4 @@ function equacaoSomaCompartimentos(matrizQ, matrizX, q){
 
 
 
-alert('Calculo OK');
+//alert('Calculo OK');

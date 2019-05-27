@@ -101,6 +101,7 @@ function setup(flag) {
         
         if(!G.extremos){
             G.extremos = new Extremos(null,null,null,null);
+            G.extremosH = new Extremos(null,null,null,null);
         }
         
         if(flag == BTNAUTO){
@@ -135,7 +136,8 @@ function lerParametros(){
         G.hMin = parseFloat($('hMin').value);
         G.hMax = parseFloat($('hMax').value);
         G.erroMax = parseFloat($('erroMax').value);
-        G.velocidade = parseFloat($('velocidade').value); 
+        G.velocidade = parseFloat($('velocidade').value);
+         
     }catch(err){
         alert('Erro lerParametros: '+err);
     }        
@@ -229,6 +231,11 @@ while(iteracao < G.velocidade && stop == false){
             stop = true;
         }
 
+
+        if(routineStopPorEstabilidade()){
+            stop = true;
+        }
+
         
         if(stop){
             routineTabelaRotulos(false,true);
@@ -259,8 +266,17 @@ function routineGraficos(){
         for(var q in G.compartimentos){
             G.compartimentos[q].draw();    
             G.extremos.atualiza(G.compartimentos[q].getExtremos());
+            G.extremosH.atualiza(G.compartimentos[q].getExtremosH());
             G.compartimentos[q].setRelatives(G.extremos,G.bordas);
-            G.compartimentos[q].drawGrafico();
+            G.compartimentos[q].setRelativesH(G.extremosH,G.bordas);
+            if($('chkGraficoQuantidade').checked){
+                G.compartimentos[q].drawGrafico();
+            }
+            if($('chkGraficoPasso').checked){
+                G.compartimentos[q].drawGraficoH();
+            }
+            
+            
         }
         
         Desenho.eixos(G.extremos,G.bordas,'u.T','u.V');
@@ -273,7 +289,11 @@ function routineGraficos(){
         arrayStatus.push('erro0 = '+G.erro[0]);
         arrayStatus.push('erro1 = '+G.erro[1]);
         arrayStatus.push('erro2 = '+G.erro[2]);
-        arrayStatus.push('erro = '+G.aviso);
+        arrayStatus.push('passo1 = '+G.h[0]);
+        arrayStatus.push('passo2 = '+G.h[1]);
+        arrayStatus.push('passo3 = '+G.h[2]);
+        
+        arrayStatus.push('ERRO EXECUÇÃO = '+G.aviso);
         Desenho.desenharStatus(arrayStatus);        
         
     }catch(err){

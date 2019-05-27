@@ -5,6 +5,7 @@ class Compartimento{
             this.code = code;
             this.pontos = new Pontos();
             this.cor = Cores.getNewCor(code,0);
+            this.corH = Cores.getNewCor(code,1);
             this.q =  q;
             this.name = 'Compartimento'+code;               
             this.count = 0;
@@ -32,13 +33,13 @@ class Compartimento{
             this.q = q;
             this.count++;
             this.pontos.add(new Ponto(t,q));
-        }catch(err){alert('Erro Compartimento.addPonto()'+err);}
+        }catch(err){alert('Erro Compartimento.update()'+err);}
     }
 
     updateH(t,h){
         try{    
            this.pontosH.add(new Ponto(t,h));
-        }catch(err){alert('Erro Compartimento.addPonto()'+err);}
+        }catch(err){alert('Erro Compartimento.updateH()'+err);}
     }
 
     
@@ -67,7 +68,14 @@ class Compartimento{
     
         }catch(err){alert('Erro Compartimento.getExtremos()'+err);}
     }
+    getExtremosH(){
+        try{    
     
+            return this.pontosH.setExtremos();
+    
+    
+        }catch(err){alert('Erro Compartimento.getExtremosH()'+err);}
+    }
     setRelatives(extremos,bordas){
         try{    
     
@@ -76,6 +84,15 @@ class Compartimento{
         }catch(err){alert('Erro Compartimento.setRelatives()'+err);}
     }
     
+    setRelativesH(extremos,bordas){
+        try{    
+    
+            this.pontosH.setRelative(extremos,bordas[0],bordas[1],bordas[2],bordas[3]);
+    
+        }catch(err){alert('Erro Compartimento.setRelativesH()'+err);}
+    }
+    
+    
     drawGrafico(){
         try{
      
@@ -83,6 +100,15 @@ class Compartimento{
      
      
         }catch(err){alert('Erro Compartimento.drawGrafico()'+err);}
+    }
+    
+    drawGraficoH(){
+        try{
+     
+            Desenho.desenharLinhas(this.pontosH,this.corH,1);
+     
+     
+        }catch(err){alert('Erro Compartimento.drawGraficoH()'+err);}
     }
 }
 

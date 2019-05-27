@@ -225,11 +225,11 @@ class Desenho{
         try{
             fill(255);
             strokeWeight(0);
-            textSize(20);
+            textSize(13);
             
             for(var i in arraytextos){
                 var posEixoXx = CANVASH-400;  
-                var posEixoXy = 200+20*(i);
+                var posEixoXy = 170+20*(i);
                 text( arraytextos[i],posEixoXx,posEixoXy);
             }
             

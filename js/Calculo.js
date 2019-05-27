@@ -98,9 +98,10 @@ function  calculoRk6Compartimentos(Q, X, global, q, flagDebug){
                     global.erro[q] = R;
                     //Print.tabela(['80 R = '+R]);
                     //Print.tabela(['80 RMAX = '+erroMax]);
-        
+                    
                     if(R <= erroMax){
                         global.t[q] += global.h[q];
+                        global.hLastUsed[q] = global.h[q]; 
                         novoQ[q] = Q[q] + 25/216*K1[q] + 1408/2565*K3[q] + 2197/4104*K4[q] - 1/5*K5[q];
                         
                         //Print.tabela(['87 Novo Q = '+novoQ[q]]);
@@ -151,7 +152,6 @@ function  calculoRk6Compartimentos(Q, X, global, q, flagDebug){
                     }else if(global.h[q] < hMin){
                             //Print.tabela(['ERRO: 116 H minimo alcançado BREAK - h = '+global.h[q] ]);
                             debug.push('HMINIMO BREAK');
-                            aviso('HMINIMO BREAK i='+global.i);
                             global.aviso = 'HMINIMO BREAK i='+global.i;
                             
                             Print.tabela(debug);

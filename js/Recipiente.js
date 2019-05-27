@@ -30,7 +30,7 @@ class Recipiente{
 }
 
 class Conteudo{
-    constructor(X,Y,L,H){try{
+    constructor(X,Y,L,H,intensidade){try{
         noStroke();
         fill(0,0,255);
         rect(X,Y,L,H);

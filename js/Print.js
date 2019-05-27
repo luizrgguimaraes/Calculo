@@ -16,9 +16,12 @@ class Print{
     }
 
 
-    static tabela(rotulos,th,colspan){
+    static tabela(rotulos,th,colspan,tabelaFinal){
         try{
             var table = $('tabelaResultados');
+            if(tabelaFinal){
+                table = $('tabelaResultadosFinal');
+            }
             if(!table){
                 alert('Erro Print.tabela(): tabelaResultados NotFound');
                 return;

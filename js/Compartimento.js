@@ -9,8 +9,8 @@ class Compartimento{
             this.name = 'Compartimento'+code;               
             this.count = 0;
             this.update(0,this.q);
-        
-        
+            this.pontosH = new Pontos();
+            this.updateH(0,0);
         
         }catch(err){alert('Erro Compartimento'+err);}
     }
@@ -34,6 +34,13 @@ class Compartimento{
             this.pontos.add(new Ponto(t,q));
         }catch(err){alert('Erro Compartimento.addPonto()'+err);}
     }
+
+    updateH(t,h){
+        try{    
+           this.pontosH.add(new Ponto(t,h));
+        }catch(err){alert('Erro Compartimento.addPonto()'+err);}
+    }
+
     
     draw(){
         try{    

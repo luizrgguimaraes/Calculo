@@ -4,11 +4,14 @@ const CANVASH = 700;
 const CORFUNDOCANVAS = 50;
 class G{}
 
+const BTNAUTO = 1;
+const BTNRESET = 2;
+
+
+
 G.maxCompartimento = 0;
 G.countConexao = 0;
 G.countCompartimento = 0;
-
-
 
 inserirConexao(0,0.1,1);
 inserirConexao(1,0.05,2);
@@ -21,15 +24,14 @@ inserirCompartimento(0,1000);
 function setup(flag) {
     try{
     
-    
-        
         frameRate(FRAMERATE);
         createCanvas(CANVASH, CANVASW);
         background(CORFUNDOCANVAS);
         
         G.bordas = [0.5,0.05,0.05,0.05];
-        Print.limpar();
-        
+
+
+        //preencher entrada        
         G.matrizQ = new Array();
         for(var i = 0; i < G.countCompartimento; i++){
             var id = parseInt($('compartimentoId'+i).value);
@@ -75,37 +77,25 @@ function setup(flag) {
         
         G.salvarQ = new Array();
         
-        //Print.tabela(['Matriz Q']);
-        //Print.tabela(G.matrizQ);
-        //Print.tabela(['Matriz Taxa']);
-        //for(var k in G.matrizTaxa){
-        //    Print.tabela(G.matrizTaxa[k]);
-        //}
-
-         
         G.i = 0;
         
         G.t = new Array();
         G.h = new Array();
+        G.hLastUsed = new Array();
         //G.h = parseFloat($('passo').value);         
-        G.iMax = parseFloat($('iMax').value);
-        G.estabilidade = parseFloat($('estabilidade').value);
-        G.tMax = parseFloat($('tempoMax').value);
-        G.hMin = parseFloat($('hMin').value);
-        G.hMax = parseFloat($('hMax').value);
-        G.erroMax = parseFloat($('erroMax').value);
+        
+        lerParametros();
+
         G.erro = new Array();
         G.aviso = '';
         
         G.stop = 0;
         
-        
-        
-        
         G.compartimentos = new Array();
         for(var i in G.matrizQ){
             G.compartimentos[i] = new Compartimento(i, G.matrizQ[i]);
             G.h[i] = parseFloat($('passo').value);
+            G.hLastUsed[i] = 0;
             G.t[i] = 0;
         }
         
@@ -113,13 +103,11 @@ function setup(flag) {
             G.extremos = new Extremos(null,null,null,null);
         }
         
-        if(flag){
+        if(flag == BTNAUTO){
             loop();
         }else{
             noLoop();
         }
-        limparAvisos();
-        //routineTabela(false);
         
         Print.limpar();
         routineTabelaRotulos(false,0);
@@ -128,6 +116,8 @@ function setup(flag) {
         routineTabelaIndividual(false,2);
         routineGraficos();
         
+        
+        G.flagNoExecute = true;
         //noLoop();
 
     }catch(err){
@@ -137,20 +127,47 @@ function setup(flag) {
         
 }
 
-function draw() {
+function lerParametros(){        
     try{
-        var stop = false;
-        var rk6 = false;
+        G.iMax = parseFloat($('iMax').value);
+        G.estabilidade = parseFloat($('estabilidade').value);
+        G.tMax = parseFloat($('tempoMax').value);
+        G.hMin = parseFloat($('hMin').value);
+        G.hMax = parseFloat($('hMax').value);
+        G.erroMax = parseFloat($('erroMax').value);
+        G.velocidade = parseFloat($('velocidade').value); 
+    }catch(err){
+        alert('Erro lerParametros: '+err);
+    }        
+}        
+
+
+function draw() {
+    
+    try{
         
-        background(CORFUNDOCANVAS);
-        
+        if(G.flagNoExecute){
+            G.flagNoExecute = false;
+            return;
+        }
+
+var iteracao = 0;
+var stop = false;
+
+while(iteracao < G.velocidade && stop == false){
+
+        stop = false;
         
         G.i++;
         G.salvarQ = G.matrizQ.slice();
         
-
-        if($('rk6').checked){
+        var flagSomenteUltima = true;
+        if($('chkPrintResultadosParciais').checked){
+            flagSomenteUltima = false;
+        }
         
+        if($('rk6').checked){
+            G.rk6 = true;
             
             var ordem = definirOrdem([G.t[0]+G.h[0],G.t[1]+G.h[1],G.t[2]+G.h[2]]);
             var i = 0;
@@ -162,7 +179,7 @@ function draw() {
             }else{
 
                 if(calculoRk6Compartimentos(G.matrizQ, G.matrizTaxa, G, ordem[i],false)){
-                    routineTabelaIndividual(true, ordem[i]);
+                    routineTabelaIndividual(flagSomenteUltima, ordem[i]);
 
                 }else{
                     stop = true;
@@ -179,19 +196,23 @@ function draw() {
             }
 
             G.t[0] += G.h[0];
+            
             G.t[1] += G.h[1];
             G.t[2] += G.h[2];
             
-            G.t[0] = round(G.t[0],7);
-            G.t[1] = round(G.t[1],7);
-            G.t[2] = round(G.t[2],7);
+            G.t[0] = round2(G.t[0],7);
+            G.t[1] = round2(G.t[1],7);
+            G.t[2] = round2(G.t[2],7);
+            
+            //alert(G.t[0]+' - '+ G.h[0]);
             if(G.t[0] >= (G.tMax)){
                 stop = true;
             }
             
-            routineTabelaIndividual(false,0);
-            routineTabelaIndividual(false,1);
-            routineTabelaIndividual(false,2);
+            routineTabela(flagSomenteUltima);
+            //routineTabelaIndividual(flagSomenteUltima,0);
+            //routineTabelaIndividual(flagSomenteUltima,1);
+            //routineTabelaIndividual(flagSomenteUltima,2);
         
         }
         
@@ -199,16 +220,21 @@ function draw() {
         
         for(var q in G.compartimentos){
             G.compartimentos[q].update(G.t[q], G.matrizQ[q]);
+            G.compartimentos[q].updateH(G.t[q], G.h[q]);
         }
         
 
         if(G.i > G.iMax){
+            
             stop = true;
         }
 
         
         if(stop){
+            routineTabelaRotulos(false,true);
+            routineTabela(false,true);
             noLoop();
+            
         }
         
         //ajustar t
@@ -216,13 +242,16 @@ function draw() {
             //G.t[1] = parseFloat(G.t[1].toFixed(5));
             //G.t[2] = parseFloat(G.t[2].toFixed(5));
         
+        background(CORFUNDOCANVAS);
         routineGraficos();
-        
-        
+    iteracao++;
+}
+    
     }catch(err){
         alert('Erro draw: '+err);
-    }            
+    }
 }
+
 
 function routineGraficos(){
     try{
@@ -244,7 +273,7 @@ function routineGraficos(){
         arrayStatus.push('erro0 = '+G.erro[0]);
         arrayStatus.push('erro1 = '+G.erro[1]);
         arrayStatus.push('erro2 = '+G.erro[2]);
-        arrayStatus.push('aviso = '+G.aviso);
+        arrayStatus.push('erro = '+G.aviso);
         Desenho.desenharStatus(arrayStatus);        
         
     }catch(err){
@@ -253,9 +282,10 @@ function routineGraficos(){
 
 }
 
-function routineTabela(flagSomenteUltima, casas){
+function routineTabela(flagSomenteUltima,FlagResultadoFinal){
     try{
     
+        /*
         if(G.i == 0){
             var rotulos = new Array();
             rotulos.push('i'); 
@@ -266,14 +296,13 @@ function routineTabela(flagSomenteUltima, casas){
             }
             rotulos.push('soma'); 
             Print.tabela(rotulos,true);
-        }
+        } */
         
         var soma = 0;
         for(var i in G.compartimentos){
             soma+= G.matrizQ[i];
         }
-        
-        
+
         var flag = true;
         
         if(flagSomenteUltima){
@@ -284,38 +313,20 @@ function routineTabela(flagSomenteUltima, casas){
             }
         }
         
-        
         if(flag){
-                var ordem = definirOrdem(G.t);
                 var linha = new Array();
-                for(var o in ordem){
-                    linha[o] = new Array();
-                    linha[o].push(G.i);
-                    var erro = null;
-                    for(var i in G.compartimentos){
-                        if(i == ordem[o]){
-                            //if(o>0 && (G.t[i] == savet)){
-                                //linha[o-1].push(G.t[i],G.h[i],G.matrizQ[i]);                                
-                                
-                            //}else{
-                                linha[o].push(G.t[i],G.h[i],G.matrizQ[i]);
-                                erro = 1000*Math.exp(-0.1) - G.matrizQ[i]; 
-                            //}
-                            //savet = G.t[i];
-                        }else{
-                            linha[o].push("","","");
-                        }
-                    }
-                    linha[o].push(soma);
-                    
-                    
-                    linha[o].push(erro);
-                    
+                linha.push(G.i,'',G.t[0],G.h[0]);
+                for(var i in G.compartimentos){
+                    linha.push(G.matrizQ[i]);
                 }
+                linha.push(soma);
                 
-                for(var i in linha){
-                    Print.tabela(linha[i]);
+                if(FlagResultadoFinal){
+                    Print.tabela(linha,false,false,true);
                 }
+                Print.tabela(linha);
+                
+                
         }
         
     }catch(err){
@@ -323,7 +334,7 @@ function routineTabela(flagSomenteUltima, casas){
     }
 
 }
-function routineTabelaRotulos(){
+function routineTabelaRotulos(FlagResultadoFinal,FlagResultadoFinal){
     try{
 
 
@@ -335,8 +346,13 @@ function routineTabelaRotulos(){
             rotulos.push('Compartimento 1');
             rotulos.push('Compartimento 2');
             rotulos.push('Compartimento 3');
-            rotulos.push('soma'); 
+            rotulos.push('soma');
+            if(FlagResultadoFinal){
+                Print.tabela(rotulos,true,false,true);
+            }
             Print.tabela(rotulos,true);
+             
+            
         
     }catch(err){
         alert('Erro routineTabela: '+err);
@@ -346,7 +362,7 @@ function routineTabelaRotulos(){
 
 
 
-function routineTabelaIndividual(flagSomenteUltima, q){
+function routineTabelaIndividual(flagSomenteUltima, q,FlagResultadoFinal){
     try{
     
         
@@ -373,7 +389,7 @@ function routineTabelaIndividual(flagSomenteUltima, q){
                 linha.push(G.i);
                 linha.push(q);
                 linha.push(G.t[q]);
-                linha.push(G.h[q]);
+                linha.push(G.hLastUsed[q]);
                 
                 
                 
@@ -386,7 +402,12 @@ function routineTabelaIndividual(flagSomenteUltima, q){
                     }
                 }
                 linha.push(soma);
+                if(FlagResultadoFinal){
+                    Print.tabela(linha,false,false,true);
+                }
                 Print.tabela(linha);
+                
+            
         }
         
     }catch(err){

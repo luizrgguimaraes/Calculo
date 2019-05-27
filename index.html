@@ -18,7 +18,18 @@
             
         </head>
         <body>
-<button onclick="draw();">passo</button><button onclick="setup(true);">iniciar</button><button onclick="noLoop();">pause</button><button onclick="setup();">reset</button><button onclick="loop();">continuar</button><h1>Modelos Compartimentais - Centro Universitario SENAC - Santo Amaro - Abril/19</h1><div id="divResultados" style="position:absolute;top:520px;left:10px;border: 0px solid red;height:550px;overflow:auto;">
+<button onclick="setup(BTNAUTO);">auto</button>
+<button onclick="setup(BTNRESET);">reset</button>
+<button onclick="draw();">manual</button>
+<button onclick="noLoop();">pausar</button>
+<button onclick="lerParametros();loop();">continuar</button>
+<h1>Modelos Compartimentais - Centro Universitario SENAC - Campus Santo Amaro - Maio/19</h1>
+
+<div id="divResultados" style="position:absolute;top:520px;left:10px;border: 0px solid red;height:550px;overflow:auto;">
+          <h2>Resultado Final</h2>
+          <table id="tabelaResultadosFinal">
+          </table>
+
           <h2>Resultados Parciais</h2>
           <table id="tabelaResultados">
           </table>
@@ -48,15 +59,13 @@
                 <td>
                     <input id=erroMax value=0.0001></input>
                 </td>
-                <td>
-                <input type="checkbox" id="rk6" checked>RK6</input>
-
-                </td>
-        
             </tr>
         </table>
-            
-    
+        <input type="checkbox" id="rk6" checked>RK6</input>
+        </br>
+        <input type="checkbox" id="chkPrintResultadosParciais" checked>Imprimir Resultados Parciais</input>
+        </br>    
+        Velocidade:<input id=velocidade value=1></input>
         
         
         </br><b style="font-size:30px;">Compartimentos</b>
@@ -71,7 +80,7 @@
         </table>
         <button onclick="inserirConexao();">  +  </button>
         
-        </br></br><b style="font-size:30px;">Avisos</b>
+        </br>
         
 
 </div><script src="js/compartimentos.js"></script></body></html>

@@ -1,13 +1,17 @@
 // JavaScript Document
 
-function round(num, casas){
+function round2(num, casas){
     try{
     
         var fator = 1.0;
         for(var i = 0; i< casas; i++){
             fator *= 10.0;
-        }                                                                
-        return Math.round(num*fator)/fator;
+        }
+        
+        //alert('fator = '+fator);
+        var res = Math.round(num*fator)/fator;
+        //alert('res = '+res);                                                                 
+        return res; 
 
     }catch(err){ alert('Erro definirOrdem: '+err); }
 }
@@ -32,16 +36,6 @@ function definirOrdem(array){
         alert('Erro definirOrdem: '+err);
     }
     
-}
-
-function aviso(string){
-    var quadro = $('quadro');
-    quadro.value += "\n"+string;
-}
-
-function limparAvisos(){
-    var quadro = $('quadro');
-    quadro.value = '';
 }
 
 
